@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MAISON — Editorial Fashion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Didact+Gothic&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #F5F0E8;
+      --warm-white: #FAF8F4;
+      --charcoal: #1C1C1A;
+      --stone: #8C8880;
+      --gold: #C9A96E;
+      --rust: #B5573A;
+      --sage: #7A8C72;
+      --ink: #2E2E2B;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Didact Gothic', sans-serif;
+      background: var(--warm-white);
+      color: var(--charcoal);
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--charcoal);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+      mix-blend-mode: multiply;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1px solid var(--charcoal);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.25s ease-out, width 0.3s, height 0.3s;
+    }
+    body:has(.product-card:hover) .cursor { width: 48px; height: 48px; background: var(--gold); }
+    body:has(.product-card:hover) .cursor-ring { opacity: 0; }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.5rem 3rem;
+      background: rgba(250, 248, 244, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(140, 136, 128, 0.15);
+      animation: slideDown 0.8s ease both;
+    }
+    @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; font-weight: 300;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.7rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--stone);
+      text-decoration: none;
+      transition: color 0.3s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -3px; left: 0;
+      width: 0; height: 1px; background: var(--gold);
+      transition: width 0.3s ease;
+    }
+    .nav-links a:hover { color: var(--charcoal); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-actions { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-icon { background: none; border: none; cursor: none; position: relative; }
+    .nav-icon svg { width: 20px; height: 20px; stroke: var(--stone); transition: stroke 0.3s; }
+    .nav-icon:hover svg { stroke: var(--charcoal); }
+    .cart-count {
+      position: absolute; top: -6px; right: -6px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--rust); color: white;
+      font-size: 0.6rem; display: flex; align-items: center; justify-content: center;
+      font-family: 'Didact Gothic', sans-serif;
+    }
+
+    .hero {
+      height: 100vh;
+      display: grid; grid-template-columns: 1fr 1fr;
+      padding-top: 80px;
+      overflow: hidden;
+    }
+    .hero-text {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 4rem 3rem 4rem 4rem;
+      animation: fadeUp 1s 0.3s ease both;
+    }
+    @keyframes fadeUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+    .hero-season {
+      font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.5rem;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.5rem, 6vw, 6rem);
+      font-weight: 300; line-height: 1.05;
+      color: var(--charcoal);
+      margin-bottom: 1.5rem;
+    }
+    .hero-title em { font-style: italic; color: var(--stone); }
+    .hero-subtitle {
+      font-size: 0.8rem; letter-spacing: 0.08em; line-height: 1.8;
+      color: var(--stone); max-width: 380px;
+      margin-bottom: 3rem;
+    }
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 1rem;
+      background: var(--charcoal); color: var(--cream);
+      text-decoration: none;
+      font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
+      padding: 1.1rem 2.5rem;
+      transition: background 0.3s, gap 0.3s;
+      width: fit-content;
+    }
+    .hero-cta:hover { background: var(--ink); gap: 1.5rem; }
+    .hero-cta svg { width: 16px; height: 16px; stroke: currentColor; }
+
+    .hero-image {
+      position: relative; overflow: hidden;
+      animation: fadeIn 1.2s 0.2s ease both;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .hero-image img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 8s ease;
+    }
+    .hero:hover .hero-image img { transform: scale(1.04); }
+    .hero-image-tag {
+      position: absolute; bottom: 2.5rem; left: 2rem;
+      background: rgba(250,248,244,0.88);
+      backdrop-filter: blur(8px);
+      padding: 1rem 1.5rem;
+      font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--charcoal);
+    }
+
+    .marquee-wrap {
+      background: var(--charcoal);
+      overflow: hidden; padding: 0.9rem 0;
+    }
+    .marquee-track {
+      display: flex; gap: 0; white-space: nowrap;
+      animation: marquee 22s linear infinite;
+    }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .marquee-item {
+      font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--cream); padding: 0 2.5rem; opacity: 0.7;
+    }
+    .marquee-item span { color: var(--gold); margin-right: 2.5rem; }
+
+    .section-header {
+      text-align: center; padding: 5rem 2rem 3rem;
+      animation: fadeUp 0.7s ease both;
+    }
+    .section-label {
+      font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 4vw, 4rem);
+      font-weight: 300; color: var(--charcoal);
+    }
+    .section-title em { font-style: italic; }
+
+    .filter-bar {
+      display: flex; justify-content: center; gap: 0.5rem;
+      padding: 0 2rem 3rem; flex-wrap: wrap;
+    }
+    .filter-btn {
+      background: none; border: 1px solid rgba(140,136,128,0.3);
+      padding: 0.5rem 1.5rem; cursor: none;
+      font-family: 'Didact Gothic', sans-serif;
+      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--stone); transition: all 0.3s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--charcoal); border-color: var(--charcoal);
+      color: var(--cream);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2px;
+      padding: 0 2rem 5rem;
+      max-width: 1600px; margin: 0 auto;
+    }
+    .product-card {
+      position: relative; overflow: hidden;
+      background: var(--cream);
+      cursor: none;
+      animation: fadeUp 0.6s ease both;
+    }
+    .product-card:nth-child(2) { animation-delay: 0.1s; }
+    .product-card:nth-child(3) { animation-delay: 0.2s; }
+    .product-card:nth-child(4) { animation-delay: 0.3s; }
+    .product-card:nth-child(5) { animation-delay: 0.4s; }
+    .product-card:nth-child(6) { animation-delay: 0.5s; }
+
+    .product-img-wrap {
+      aspect-ratio: 3/4; overflow: hidden;
+      position: relative;
+    }
+    .product-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .product-card:hover .product-img-wrap img { transform: scale(1.08); }
+
+    .product-badge {
+      position: absolute; top: 1rem; left: 1rem;
+      font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 0.3rem 0.8rem;
+      z-index: 2;
+    }
+    .badge-new { background: var(--charcoal); color: var(--cream); }
+    .badge-sale { background: var(--rust); color: white; }
+    .badge-sold { background: var(--stone); color: white; }
+
+    .product-actions {
+      position: absolute; bottom: 1rem; right: 1rem;
+      display: flex; flex-direction: column; gap: 0.5rem;
+      opacity: 0; transform: translateX(10px);
+      transition: all 0.3s ease;
+      z-index: 3;
+    }
+    .product-card:hover .product-actions { opacity: 1; transform: none; }
+
+    .action-btn {
+      width: 40px; height: 40px;
+      background: rgba(250,248,244,0.9);
+      backdrop-filter: blur(8px);
+      border: none; cursor: none;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .action-btn:hover { background: var(--charcoal); }
+    .action-btn:hover svg { stroke: white; }
+    .action-btn svg { width: 16px; height: 16px; stroke: var(--charcoal); transition: stroke 0.2s; }
+
+    .product-info { padding: 1.2rem 1.4rem 1.6rem; }
+    .product-category {
+      font-size: 0.55rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--stone); margin-bottom: 0.4rem;
+    }
+    .product-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem; font-weight: 400;
+      color: var(--charcoal); margin-bottom: 0.6rem;
+      line-height: 1.2;
+    }
+    .product-pricing { display: flex; align-items: baseline; gap: 0.6rem; }
+    .product-price { font-size: 0.85rem; color: var(--charcoal); }
+    .product-old-price {
+      font-size: 0.75rem; color: var(--stone);
+      text-decoration: line-through;
+    }
+    .product-colors {
+      display: flex; gap: 0.4rem; margin-top: 0.8rem;
+    }
+    .color-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.1);
+      cursor: none;
+      transition: transform 0.2s;
+    }
+    .color-dot:hover { transform: scale(1.3); }
+
+    .featured-banner {
+      margin: 2rem;
+      display: grid; grid-template-columns: 1fr 1fr;
+      min-height: 500px;
+      overflow: hidden;
+      background: var(--charcoal);
+    }
+    .banner-content {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 4rem 3.5rem;
+      color: var(--cream);
+    }
+    .banner-label {
+      font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.5rem;
+    }
+    .banner-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 3.5vw, 3.5rem);
+      font-weight: 300; line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+    .banner-title em { font-style: italic; color: var(--stone); }
+    .banner-text {
+      font-size: 0.8rem; line-height: 1.9; color: rgba(245,240,232,0.6);
+      max-width: 340px; margin-bottom: 2.5rem;
+    }
+    .banner-cta {
+      display: inline-flex; align-items: center; gap: 1rem;
+      border: 1px solid rgba(201,169,110,0.5);
+      color: var(--gold); text-decoration: none;
+      font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
+      padding: 0.9rem 2rem;
+      width: fit-content;
+      transition: all 0.3s;
+    }
+    .banner-cta:hover { background: var(--gold); color: var(--charcoal); border-color: var(--gold); gap: 1.5rem; }
+    .banner-cta svg { width: 14px; height: 14px; stroke: currentColor; }
+    .banner-image { overflow: hidden; }
+    .banner-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 6s ease; }
+    .featured-banner:hover .banner-image img { transform: scale(1.05); }
+
+    .categories {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 2px; padding: 2rem;
+    }
+    .category-card {
+      position: relative; aspect-ratio: 2/3;
+      overflow: hidden; cursor: none;
+    }
+    .category-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+    .category-card:hover img { transform: scale(1.06); }
+    .category-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(28,28,26,0.7) 0%, transparent 50%);
+      display: flex; align-items: flex-end;
+      padding: 1.5rem;
+    }
+    .category-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 300;
+      color: var(--cream); letter-spacing: 0.05em;
+    }
+
+    .newsletter {
+      background: var(--cream);
+      border-top: 1px solid rgba(140,136,128,0.2);
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+    .newsletter-eyebrow {
+      font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1rem;
+    }
+    .newsletter-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 3vw, 3rem);
+      font-weight: 300; margin-bottom: 1rem;
+    }
+    .newsletter-sub {
+      font-size: 0.8rem; color: var(--stone); margin-bottom: 2.5rem; letter-spacing: 0.05em;
+    }
+    .newsletter-form {
+      display: flex; max-width: 460px; margin: 0 auto;
+      border-bottom: 1px solid var(--charcoal);
+    }
+    .newsletter-input {
+      flex: 1; background: none; border: none; outline: none;
+      font-family: 'Didact Gothic', sans-serif;
+      font-size: 0.8rem; letter-spacing: 0.08em;
+      padding: 0.8rem 0; color: var(--charcoal);
+    }
+    .newsletter-input::placeholder { color: var(--stone); }
+    .newsletter-submit {
+      background: none; border: none; cursor: none;
+      font-family: 'Didact Gothic', sans-serif;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--charcoal); padding: 0.8rem 0 0.8rem 1rem;
+      transition: color 0.3s;
+    }
+    .newsletter-submit:hover { color: var(--gold); }
+
+    footer {
+      background: var(--charcoal); color: var(--cream);
+      padding: 4rem 3rem 2rem;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+    }
+    .footer-brand .nav-logo { color: var(--cream); display: block; margin-bottom: 1.2rem; }
+    .footer-tagline { font-size: 0.75rem; line-height: 1.8; color: rgba(245,240,232,0.45); max-width: 240px; }
+    .footer-col-title {
+      font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.2rem;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+    .footer-links a {
+      font-size: 0.75rem; color: rgba(245,240,232,0.5);
+      text-decoration: none; letter-spacing: 0.05em;
+      transition: color 0.3s;
+    }
+    .footer-links a:hover { color: var(--cream); }
+    .footer-bottom {
+      grid-column: 1 / -1;
+      border-top: 1px solid rgba(245,240,232,0.1);
+      padding-top: 1.5rem; margin-top: 1rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-copy { font-size: 0.65rem; color: rgba(245,240,232,0.3); letter-spacing: 0.08em; }
+
+    .cart-overlay {
+      position: fixed; inset: 0; background: rgba(28,28,26,0.5);
+      z-index: 200; opacity: 0; pointer-events: none;
+      transition: opacity 0.4s;
+    }
+    .cart-overlay.open { opacity: 1; pointer-events: all; }
+    .cart-drawer {
+      position: fixed; right: 0; top: 0; bottom: 0;
+      width: 420px; background: var(--warm-white);
+      z-index: 201; transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      display: flex; flex-direction: column;
+    }
+    .cart-drawer.open { transform: none; }
+    .cart-header {
+      padding: 2rem; border-bottom: 1px solid rgba(140,136,128,0.2);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .cart-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 300;
+    }
+    .cart-close { background: none; border: none; cursor: none; }
+    .cart-close svg { width: 20px; height: 20px; stroke: var(--stone); }
+    .cart-items { flex: 1; overflow-y: auto; padding: 1.5rem 2rem; }
+    .cart-empty {
+      text-align: center; padding: 4rem 2rem;
+      font-size: 0.8rem; color: var(--stone); letter-spacing: 0.08em;
+    }
+    .cart-empty-icon { margin-bottom: 1rem; }
+    .cart-empty-icon svg { width: 40px; height: 40px; stroke: var(--stone); opacity: 0.4; }
+    .cart-item {
+      display: flex; gap: 1rem; padding: 1.2rem 0;
+      border-bottom: 1px solid rgba(140,136,128,0.15);
+    }
+    .cart-item-img {
+      width: 80px; height: 100px; object-fit: cover;
+      flex-shrink: 0;
+    }
+    .cart-item-info { flex: 1; }
+    .cart-item-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; margin-bottom: 0.25rem;
+    }
+    .cart-item-meta { font-size: 0.65rem; color: var(--stone); letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+    .cart-item-price { font-size: 0.8rem; }
+    .cart-item-remove { background: none; border: none; cursor: none; }
+    .cart-item-remove svg { width: 14px; height: 14px; stroke: var(--stone); }
+    .cart-footer { padding: 2rem; border-top: 1px solid rgba(140,136,128,0.2); }
+    .cart-total {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .cart-total-label { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--stone); }
+    .cart-total-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; font-weight: 300;
+    }
+    .checkout-btn {
+      width: 100%; padding: 1.1rem;
+      background: var(--charcoal); color: var(--cream);
+      border: none; cursor: none;
+      font-family: 'Didact Gothic', sans-serif;
+      font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
+      transition: background 0.3s;
+    }
+    .checkout-btn:hover { background: var(--ink); }
+
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: var(--charcoal); color: var(--cream);
+      padding: 0.8rem 2rem;
+      font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+      z-index: 300; opacity: 0;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-image { height: 60vw; }
+      .featured-banner { grid-template-columns: 1fr; }
+      .banner-image { height: 300px; }
+      .categories { grid-template-columns: 1fr 1fr; }
+      footer { grid-template-columns: 1fr 1fr; }
+      nav { padding: 1.2rem 1.5rem; }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 600px) {
+      .products-grid { grid-template-columns: 1fr 1fr; gap: 2px; padding: 0 0.5rem 3rem; }
+      .categories { grid-template-columns: 1fr 1fr; gap: 2px; padding: 0.5rem; }
+      footer { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <a href="#" class="nav-logo">Maison</a>
+  <ul class="nav-links">
+    <li><a href="#new">New In</a></li>
+    <li><a href="#women">Women</a></li>
+    <li><a href="#men">Men</a></li>
+    <li><a href="#designers">Designers</a></li>
+    <li><a href="#sale">Sale</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="nav-icon" id="searchBtn" title="Search">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </button>
+    <button class="nav-icon" title="Wishlist">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+    </button>
+    <button class="nav-icon" id="cartBtn" title="Cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 0 1-8 0"/>
+      </svg>
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+</nav>
+
+<section class="hero" id="new">
+  <div class="hero-text">
+    <p class="hero-season">Spring / Summer 2025</p>
+    <h1 class="hero-title">Dressed in<br><em>Quiet</em><br>Luxury</h1>
+    <p class="hero-subtitle">Refined silhouettes, considered fabrics, and effortless elegance for the contemporary wardrobe.</p>
+    <a href="#products" class="hero-cta">
+      Explore Collection
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+      </svg>
+    </a>
+  </div>
+  <div class="hero-image">
+    <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=900&auto=format&fit=crop" alt="Spring Collection"/>
+    <div class="hero-image-tag">SS25 Collection — Available Now</div>
+  </div>
+</section>
+
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item"><span>✦</span> New Arrivals</span>
+    <span class="marquee-item"><span>✦</span> Free Shipping Over $200</span>
+    <span class="marquee-item"><span>✦</span> Sustainable Fabrics</span>
+    <span class="marquee-item"><span>✦</span> Exclusive Designers</span>
+    <span class="marquee-item"><span>✦</span> SS25 Now Live</span>
+    <span class="marquee-item"><span>✦</span> 30-Day Returns</span>
+    <span class="marquee-item"><span>✦</span> New Arrivals</span>
+    <span class="marquee-item"><span>✦</span> Free Shipping Over $200</span>
+    <span class="marquee-item"><span>✦</span> Sustainable Fabrics</span>
+    <span class="marquee-item"><span>✦</span> Exclusive Designers</span>
+    <span class="marquee-item"><span>✦</span> SS25 Now Live</span>
+    <span class="marquee-item"><span>✦</span> 30-Day Returns</span>
+  </div>
+</div>
+
+<section id="products">
+  <div class="section-header">
+    <p class="section-label">Curated Edit</p>
+    <h2 class="section-title">New <em>Arrivals</em></h2>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="women">Women</button>
+    <button class="filter-btn" data-filter="men">Men</button>
+    <button class="filter-btn" data-filter="outerwear">Outerwear</button>
+    <button class="filter-btn" data-filter="dresses">Dresses</button>
+    <button class="filter-btn" data-filter="knitwear">Knitwear</button>
+  </div>
+
+  <div class="products-grid" id="productsGrid"></div>
+</section>
+
+<div class="featured-banner">
+  <div class="banner-content">
+    <p class="banner-label">The Edit — Capsule Collection</p>
+    <h2 class="banner-title">The <em>Linen</em><br>Summer<br>Edit</h2>
+    <p class="banner-text">Breathable, considered, endlessly wearable. Our linen collection is crafted from single-origin Belgian flax, stonewashed to a perfect softness.</p>
+    <a href="#products" class="banner-cta">
+      Shop The Edit
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+      </svg>
+    </a>
+  </div>
+  <div class="banner-image">
+    <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&auto=format&fit=crop" alt="Linen Collection"/>
+  </div>
+</div>
+
+<div class="section-header">
+  <p class="section-label">Shop By</p>
+  <h2 class="section-title">Browse <em>Categories</em></h2>
+</div>
+<div class="categories">
+  <div class="category-card">
+    <img src="https://images.unsplash.com/photo-1596609548086-85bbf8ddb6b9?w=600&auto=format&fit=crop" alt="Dresses"/>
+    <div class="category-overlay"><span class="category-name">Dresses</span></div>
+  </div>
+  <div class="category-card">
+    <img src="https://modernsewingco.com/cdn/shop/files/IMG_6797lesseditlow.jpg?v=1761135764&width=3000" alt="Outerwear"/>
+    <div class="category-overlay"><span class="category-name">Outerwear</span></div>
+  </div>
+  <div class="category-card">
+    <img src="https://www.theundone.com/cdn/shop/articles/The_Undone_How_To_Take_Care_Of_Your_Knitwear.jpg?v=1654738142&width=1500" alt="Knitwear"/>
+    <div class="category-overlay"><span class="category-name">Knitwear</span></div>
+  </div>
+  <div class="category-card">
+    <img src="blue-jeans-fabric-details.jpg" alt="Trousers"/>
+    <div class="category-overlay"><span class="category-name">Trousers</span></div>
+  </div>
+</div>
+
+<div class="newsletter">
+  <p class="newsletter-eyebrow">Stay in the Know</p>
+  <h2 class="newsletter-title">The Maison <em>Edit</em></h2>
+  <p class="newsletter-sub">Curated drops, styling notes, and early access — delivered to your inbox.</p>
+  <div class="newsletter-form">
+    <input class="newsletter-input" type="email" placeholder="Your email address"/>
+    <button class="newsletter-submit">Subscribe</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-brand">
+    <a href="#" class="nav-logo">Maison</a>
+    <p class="footer-tagline">Thoughtfully sourced, beautifully made. Clothing for the considered life.</p>
+  </div>
+  <div>
+    <p class="footer-col-title">Shop</p>
+    <ul class="footer-links">
+      <li><a href="#">New In</a></li>
+      <li><a href="#">Women</a></li>
+      <li><a href="#">Men</a></li>
+      <li><a href="#">Sale</a></li>
+      <li><a href="#">Designers</a></li>
+    </ul>
+  </div>
+  <div>
+    <p class="footer-col-title">Help</p>
+    <ul class="footer-links">
+      <li><a href="#">Size Guide</a></li>
+      <li><a href="#">Shipping & Returns</a></li>
+      <li><a href="#">Track Order</a></li>
+      <li><a href="#">Contact Us</a></li>
+      <li><a href="#">FAQs</a></li>
+    </ul>
+  </div>
+  <div>
+    <p class="footer-col-title">Company</p>
+    <ul class="footer-links">
+      <li><a href="#">About Maison</a></li>
+      <li><a href="#">Sustainability</a></li>
+      <li><a href="#">Careers</a></li>
+      <li><a href="#">Press</a></li>
+      <li><a href="#">Privacy Policy</a></li>
+    </ul>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2025 Maison. All rights reserved.</p>
+    <p class="footer-copy" style="letter-spacing:0.02em; opacity:0.4;">Crafted with intention.</p>
+  </div>
+</footer>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h3 class="cart-title">Your Bag</h3>
+    <button class="cart-close" id="cartClose">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty" id="cartEmpty">
+      <div class="cart-empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      </div>
+      Your bag is empty
+    </div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-price" id="cartTotal">$0.00</span>
+    </div>
+    <button class="checkout-btn">Proceed to Checkout</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+    ring.style.left = e.clientX + 'px'; ring.style.top = e.clientY + 'px';
+  });
+
+  const products = [
+    { id: 1, name: 'Cashmere Wrap Coat', category: 'outerwear', gender: 'women', price: 895, colors: ['#C8B89A','#1C1C1A','#8C6B4A'], badge: 'new', img: 'https://images.unsplash.com/photo-1548624313-0396c75e4b1a?w=500&auto=format&fit=crop' },
+    { id: 2, name: 'Silk Bias Dress', category: 'dresses', gender: 'women', price: 485, oldPrice: 680, colors: ['#C9A96E','#2E2E2B','#7A8C72'], badge: 'sale', img: 'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=500&auto=format&fit=crop' },
+    { id: 3, name: 'Merino Turtleneck', category: 'knitwear', gender: 'women', price: 195, colors: ['#F5F0E8','#8C8880','#1C1C1A'], badge: null, img: 'https://images.unsplash.com/photo-1571945153237-4929e783af4a?w=500&auto=format&fit=crop' },
+    { id: 4, name: 'Linen Trench', category: 'outerwear', gender: 'men', price: 620, colors: ['#C8B89A','#8C6B4A'], badge: 'new', img: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500&auto=format&fit=crop' },
+    { id: 5, name: 'Pleated Wide Leg', category: 'women', gender: 'women', price: 295, colors: ['#1C1C1A','#C8B89A','#7A8C72'], badge: null, img: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=500&auto=format&fit=crop' },
+    { id: 6, name: 'Wool Overshirt', category: 'men', gender: 'men', price: 345, oldPrice: 395, colors: ['#7A8C72','#8C6B4A','#1C1C1A'], badge: 'sale', img: 'https://images.unsplash.com/photo-1603252109303-2751441dd157?w=500&auto=format&fit=crop' },
+    { id: 7, name: 'Velvet Midi Skirt', category: 'dresses', gender: 'women', price: 265, colors: ['#1C1C1A','#B5573A','#7A8C72'], badge: 'new', img: 'https://www.talbots.com/dw/image/v2/BKGN_PRD/on/demandware.static/-/Sites-master-catalog-talbots/default/dw59769713/images/214018815/214018815_4171.jpg?sfrm=jpg' },
+    { id: 8, name: 'Cashmere Cardigan', category: 'knitwear', gender: 'men', price: 380, colors: ['#C8B89A','#1C1C1A','#8C8880'], badge: null, img: 'https://images.unsplash.com/photo-1611312449408-fcece27cdbb7?w=500&auto=format&fit=crop' },
+  ];
+
+  let cart = [];
+  let activeFilter = 'all';
+
+  function renderProducts(filter) {
+    const grid = document.getElementById('productsGrid');
+    const filtered = filter === 'all' ? products : products.filter(p => p.category === filter || p.gender === filter);
+    grid.innerHTML = filtered.map(p => `
+      <div class="product-card" data-id="${p.id}">
+        <div class="product-img-wrap">
+          <img src="${p.img}" alt="${p.name}" loading="lazy"/>
+          ${p.badge ? `<span class="product-badge badge-${p.badge}">${p.badge === 'new' ? 'New In' : p.badge === 'sale' ? 'Sale' : 'Sold Out'}</span>` : ''}
+          <div class="product-actions">
+            <button class="action-btn" onclick="addToCart(${p.id})" title="Add to Bag">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+            </button>
+            <button class="action-btn" title="Wishlist">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="product-info">
+          <p class="product-category">${p.category}</p>
+          <h3 class="product-name">${p.name}</h3>
+          <div class="product-pricing">
+            <span class="product-price">$${p.price.toLocaleString()}</span>
+            ${p.oldPrice ? `<span class="product-old-price">$${p.oldPrice.toLocaleString()}</span>` : ''}
+          </div>
+          <div class="product-colors">
+            ${p.colors.map(c => `<div class="color-dot" style="background:${c}" title="${c}"></div>`).join('')}
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+      renderProducts(activeFilter);
+    });
+  });
+
+  function addToCart(id) {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+    const existing = cart.find(i => i.id === id);
+    if (existing) existing.qty++;
+    else cart.push({ ...product, qty: 1 });
+    updateCartUI();
+    showToast(`${product.name} added to bag`);
+  }
+
+  function removeFromCart(id) {
+    cart = cart.filter(i => i.id !== id);
+    updateCartUI();
+  }
+
+  function updateCartUI() {
+    const count = cart.reduce((a, i) => a + i.qty, 0);
+    const total = cart.reduce((a, i) => a + i.price * i.qty, 0);
+    document.getElementById('cartCount').textContent = count;
+    document.getElementById('cartTotal').textContent = `$${total.toLocaleString()}`;
+
+    const cartItems = document.getElementById('cartItems');
+    const cartEmpty = document.getElementById('cartEmpty');
+
+    if (cart.length === 0) {
+      cartEmpty.style.display = 'block';
+      cartItems.querySelectorAll('.cart-item').forEach(el => el.remove());
+    } else {
+      cartEmpty.style.display = 'none';
+      const existing = cartItems.querySelectorAll('.cart-item');
+      existing.forEach(el => el.remove());
+      cart.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <img class="cart-item-img" src="${item.img}" alt="${item.name}"/>
+          <div class="cart-item-info">
+            <p class="cart-item-name">${item.name}</p>
+            <p class="cart-item-meta">Qty ${item.qty} · ${item.category}</p>
+            <p class="cart-item-price">$${(item.price * item.qty).toLocaleString()}</p>
+          </div>
+          <button class="cart-item-remove" onclick="removeFromCart(${item.id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        `;
+        cartItems.appendChild(div);
+      });
+    }
+  }
+
+  function openCart() {
+    document.getElementById('cartDrawer').classList.add('open');
+    document.getElementById('cartOverlay').classList.add('open');
+  }
+  function closeCart() {
+    document.getElementById('cartDrawer').classList.remove('open');
+    document.getElementById('cartOverlay').classList.remove('open');
+  }
+
+  document.getElementById('cartBtn').addEventListener('click', openCart);
+  document.getElementById('cartClose').addEventListener('click', closeCart);
+  document.getElementById('cartOverlay').addEventListener('click', closeCart);
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  document.querySelector('.newsletter-submit').addEventListener('click', () => {
+    const input = document.querySelector('.newsletter-input');
+    if (input.value && input.value.includes('@')) {
+      showToast('Thank you for subscribing!');
+      input.value = '';
+    } else {
+      showToast('Please enter a valid email');
+    }
+  });
+
+  renderProducts('all');
+</script>
+</body>
+</html>
